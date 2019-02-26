@@ -60,6 +60,11 @@ node {
 
     switch(env.BRANCH_NAME) {  
       case 'dev':
+
+        stage ('login ECR') {
+            sh "$(aws ecr get-login --no-include-email --region us-east-1)"
+        }
+        
         stage('img -> dockerhub') {
           buildImage(imageBranch)
           pushImage(imageBranch)
