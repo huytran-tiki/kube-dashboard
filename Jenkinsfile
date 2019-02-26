@@ -20,12 +20,7 @@ def pushImage(String imageName='', String dockerRepo='764574898083.dkr.ecr.us-ea
     sh "docker push ${dockerRepo}/${imageBuild}"
 }
 
-//notify build
-
-
-
 //checkout git
-
 def checkoutGit(scm) {
 	scmVars = checkout([
             $class: 'GitSCM',
@@ -40,13 +35,43 @@ def checkoutGit(scm) {
     return scmVars
 }
 
+channel = ''
+
+def notifyBuild(String buildStatus = 'STARTED', String channel = '#') {
+  // build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def subject = "${buildStatus} >> <${env.RUN_DISPLAY_URL} | *${env.JOB_NAME}* [build-${env.BUILD_NUMBER}]>"
+  def summary = "${subject}\n[<${env.RUN_CHANGES_DISPLAY_URL} | changes-log >]"
+
+
+  // Override default values based on build status
+  if (buildStatus == 'STARTED') {
+    color = 'YELLOW'
+    colorCode = '#FFFF00'
+  } else if (buildStatus == 'SUCCESSFUL') {
+    color = 'GREEN'
+    colorCode = '#00FF00'
+  } else {
+    color = 'RED'
+    colorCode = '#FF0000'
+  }
+
+  slackSend (channel: channel, color: colorCode, message: summary)
+}
+
     
 node {
   properties([disableConcurrentBuilds()])
   ansiColor('xterm') {
   try {
     project = 'test-jenkins'
-    channel = '#huy.tran2'
+    channel = '#ai-k8s-ci'
+
+    notifyBuild('STARTED', channel)
 
     stage('pull code') {
       scmVars = checkoutGit(scm)
