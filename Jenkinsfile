@@ -45,7 +45,7 @@ node {
   properties([disableConcurrentBuilds()])
   ansiColor('xterm') {
   try {
-    project = 'kube-dashboard'
+    project = 'test-jenkins'
     channel = '#huy.tran2'
 
     stage('pull code') {
