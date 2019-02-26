@@ -62,9 +62,9 @@ node {
       case 'dev':
 
         stage ('login ECR') {
-            sh "$(aws ecr get-login --no-include-email --region us-east-1)"
+            sh "aws ecr get-login --no-include-email --region us-east-1"
         }
-        
+
         stage('img -> dockerhub') {
           buildImage(imageBranch)
           pushImage(imageBranch)
