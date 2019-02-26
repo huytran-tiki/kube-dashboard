@@ -102,6 +102,7 @@ node {
     throw e
   } finally {
     // success or failure, always send notifications
+    notifyBuild(currentBuild.result, channel)
   }
   }
 }
